@@ -1,0 +1,14 @@
+{
+  "name": "ganivra",
+  "owner": { "name": "Ganivra" },
+  "description": "Ganivra plugins for Claude Code",
+  "plugins": [
+    {
+      "name": "ganivra",
+      "source": "./",
+      "description": "Claude Code context & cost audit, local usage reports, and a cost/limits status line.",
+      "category": "productivity",
+      "tags": ["cost", "context", "statusline"]
+    }
+  ]
+}

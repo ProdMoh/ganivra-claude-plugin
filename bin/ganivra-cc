@@ -1,0 +1,3 @@
+#!/bin/sh
+# Launcher for the Ganivra Claude Code plugin; Claude Code puts this bin/ folder on PATH.
+exec python3 -I "$(dirname "$0")/ganivra_usage.py" "$@"

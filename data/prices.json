@@ -1,0 +1,199 @@
+{
+ "source": "https://github.com/ProdMoh/llm-prices",
+ "as_of": "2026-11-21",
+ "unit": "USD per million tokens",
+ "fast_multiplier": {
+  "claude-opus-5-5": 2.0
+ },
+ "models": {
+  "claude-3-5-haiku-20241022": {
+   "input": 0.8,
+   "cached_input": 0.08,
+   "output": 4.0,
+   "cache_write_5m": 1.0,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-3-5-haiku-latest": {
+   "input": 0.8,
+   "cached_input": 0.08,
+   "output": 4.0,
+   "cache_write_5m": 1.0,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-fable-5": {
+   "input": 10.0,
+   "cached_input": 1.0,
+   "output": 50.0,
+   "cache_write_5m": 12.5,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-fable-5-1": {
+   "input": 10.0,
+   "cached_input": 0.25,
+   "output": 50.0,
+   "cache_write_5m": 12.5,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-haiku-4-5": {
+   "input": 1.0,
+   "cached_input": 0.1,
+   "output": 5.0,
+   "cache_write_5m": 1.25,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-haiku-5-5": {
+   "input": 0.1,
+   "cached_input": 0.01,
+   "output": 0.5,
+   "cache_write_5m": 0.125,
+   "long_prompt_over": 100000.0,
+   "long_prompt_input": 0.5,
+   "long_prompt_output": 2.5
+  },
+  "claude-mythos-5": {
+   "input": 10.0,
+   "cached_input": 1.0,
+   "output": 50.0,
+   "cache_write_5m": 12.5,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-mythos-5-1": {
+   "input": 10.0,
+   "cached_input": 0.25,
+   "output": 50.0,
+   "cache_write_5m": 12.5,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-4": {
+   "input": 15.0,
+   "cached_input": 1.5,
+   "output": 75.0,
+   "cache_write_5m": 18.75,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-4-1": {
+   "input": 15.0,
+   "cached_input": 1.5,
+   "output": 75.0,
+   "cache_write_5m": 18.75,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-4-5": {
+   "input": 5.0,
+   "cached_input": 0.5,
+   "output": 25.0,
+   "cache_write_5m": 6.25,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-4-6": {
+   "input": 5.0,
+   "cached_input": 0.5,
+   "output": 25.0,
+   "cache_write_5m": 6.25,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-4-7": {
+   "input": 5.0,
+   "cached_input": 0.5,
+   "output": 25.0,
+   "cache_write_5m": 6.25,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-4-8": {
+   "input": 5.0,
+   "cached_input": 0.5,
+   "output": 25.0,
+   "cache_write_5m": 6.25,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-5": {
+   "input": 5.0,
+   "cached_input": 0.5,
+   "output": 25.0,
+   "cache_write_5m": 6.25,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-opus-5-5": {
+   "input": 4.0,
+   "cached_input": 0.2,
+   "output": 20.0,
+   "cache_write_5m": 5.0,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-sonnet-4": {
+   "input": 3.0,
+   "cached_input": 0.3,
+   "output": 15.0,
+   "cache_write_5m": 3.75,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-sonnet-4-5": {
+   "input": 3.0,
+   "cached_input": 0.3,
+   "output": 15.0,
+   "cache_write_5m": 3.75,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-sonnet-4-6": {
+   "input": 3.0,
+   "cached_input": 0.3,
+   "output": 15.0,
+   "cache_write_5m": 3.75,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-sonnet-5": {
+   "input": 2.0,
+   "cached_input": 0.2,
+   "output": 10.0,
+   "cache_write_5m": 2.5,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  },
+  "claude-sonnet-5-5": {
+   "input": 2.0,
+   "cached_input": 0.1,
+   "output": 10.0,
+   "cache_write_5m": 2.5,
+   "long_prompt_over": null,
+   "long_prompt_input": null,
+   "long_prompt_output": null
+  }
+ }
+}

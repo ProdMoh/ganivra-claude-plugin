@@ -1,0 +1,11 @@
+{
+  "name": "ganivra",
+  "displayName": "Ganivra: Claude Code context & cost audit",
+  "version": "0.1.0",
+  "description": "See what Claude Code loads before your first prompt, what it costs, and what to turn off. Local cost reports by project, model and day, and a status line with session cost, context and plan limits. Reads usage counts only; nothing leaves your machine.",
+  "author": { "name": "Ganivra", "url": "https://ganivra.com" },
+  "homepage": "https://ganivra.com",
+  "repository": "https://github.com/ProdMoh/ganivra-claude-plugin",
+  "license": "MIT",
+  "keywords": ["cost", "usage", "context", "tokens", "statusline", "mcp", "limits"]
+}
