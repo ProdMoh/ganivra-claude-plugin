@@ -44,6 +44,17 @@ value of your usage, not what you are billed.
   [llm-prices](https://github.com/ProdMoh/llm-prices) (see `as_of` in `data/prices.json`).
 - The status line keeps a small cache of today's per-request costs in `~/.ganivra/claude-code/cache`.
 
+## Data handling
+
+| Question | Answer |
+| --- | --- |
+| What it reads | Claude Code's local session logs: token counts, model names, timestamps, tool and skill names, and working-directory names. Never prompt, response or code text. |
+| What it stores | `~/.ganivra/claude-code/`: a copy of the status line script and price list, and a cache of today's per-request costs (reset daily). |
+| What it sends | Nothing. No network requests, no telemetry. |
+| Settings it changes | Only `/ganivra:setup`, and only after you confirm: it sets the `statusLine` key in `~/.claude/settings.json`. |
+| Permissions | Its commands pre-approve only its own launcher, `ganivra-cc` (`Bash(ganivra-cc:*)`). |
+| Remove everything | `/plugin uninstall ganivra@ganivra`, delete `~/.ganivra/claude-code/`, and remove `statusLine` from your settings if you set it. |
+
 ## How the numbers work
 
 - Costs use Anthropic API list rates, including 5-minute and 1-hour cache writes, cache reads,
