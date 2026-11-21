@@ -2,6 +2,8 @@
 
 **What is Claude Code loading before you type, what does carrying it cost, and what should you turn off?**
 
+![Ganivra audit: 68.5k tokens loaded before the first prompt, what carrying them costs, and MCP servers and skills loaded but never used](docs/audit.png)
+
 ```
 /plugin marketplace add ProdMoh/ganivra-claude-plugin
 /plugin install ganivra@ganivra
