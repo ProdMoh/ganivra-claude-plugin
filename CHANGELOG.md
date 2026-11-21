@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-11-21
+
+- `/ganivra:report` now opens with a plan verdict: your usage at API rates as a monthly figure, next to
+  your plan's price ("Your plan covered 18.8x its price in usage. Keep it.").
+- Set the plan once with `--plan pro|max|ultra|team-standard|team-premium|api` or `--plan-price USD`.
+  It is saved in `~/.ganivra/check.json`, shared with the Ganivra seat check, so a plan you chose there
+  is picked up automatically.
+
 ## 0.1.0 — 2026-11-21
 
 First release.

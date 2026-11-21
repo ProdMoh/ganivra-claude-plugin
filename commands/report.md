@@ -1,6 +1,6 @@
 ---
-description: Claude Code cost by project, model and day, and what the same tokens would cost on other models
-argument-hint: "[--days N] [--csv]"
+description: Claude Code cost by project, model and day, whether your plan is worth it, and what the same tokens would cost on other models
+argument-hint: "[--days N] [--csv] [--plan pro|max|ultra|api] [--plan-price USD]"
 allowed-tools: Bash(ganivra-cc:*)
 ---
 

@@ -181,6 +181,42 @@ class LogsTest(unittest.TestCase):
         self.assertTrue(lines[0].startswith("date,project,model"))
         self.assertEqual(lines[1].split(",")[3], "2")
 
+    def test_report_asks_for_plan_when_none_saved(self):
+        self.write("s1.jsonl", self.session("s1"))
+        out = io.StringIO()
+        gu.report(1, out=out, plan=(None, None))
+        self.assertIn("### Your plan", out.getvalue())
+        self.assertIn("--plan max", out.getvalue())
+
+    def test_report_shows_verdict_for_saved_plan(self):
+        self.write("s1.jsonl", self.session("s1"))
+        out = io.StringIO()
+        gu.report(1, out=out, plan=("pro", 20.0))
+        text = out.getvalue()
+        self.assertIn("Plan: Claude Pro, $20 a month.", text)
+        self.assertIn("Only 1 active day in", text)  # one day of logs is too little to judge
+
+    def test_plan_settings_shared_with_seat_check(self):
+        path = os.path.join(self.dir, "ganivra", "check.json")
+        self.assertEqual(gu.load_plan(path), (None, None))
+        os.makedirs(os.path.dirname(path))
+        with open(path, "w") as fh:
+            json.dump({"claude": {"plan": "pro", "price": 26}, "codex": {"plan": "plus", "price": 26}}, fh)
+        self.assertEqual(gu.load_plan(path), ("pro", 26.0))
+        gu.save_plan("max", 100.0, path)
+        with open(path) as fh:
+            saved = json.load(fh)
+        self.assertEqual(saved["claude"], {"plan": "max", "price": 100.0})
+        self.assertEqual(saved["codex"], {"plan": "plus", "price": 26})  # the seat check's Codex plan is kept
+
+    def test_verdict_thresholds(self):
+        self.assertIn("Keep it", gu.verdict(184.0, 20, "pro", 20.0))
+        self.assertIn("9.2x", gu.verdict(184.0, 20, "pro", 20.0))
+        self.assertIn("break-even", gu.verdict(120.0, 20, "max", 100.0))
+        self.assertIn("API billing would have cost less", gu.verdict(30.0, 20, "max", 100.0))
+        self.assertIn("pay per token", gu.verdict(30.0, 20, "api", None))
+        self.assertIsNone(gu.verdict(30.0, 20, None, None))
+
     def test_today_cost_is_incremental(self):
         cache = os.path.join(self.dir, "cache", "today.json")
         path = self.write("s1.jsonl", [assistant("s1", "m1", usage(inp=1_000_000), minutes_ago=0)])

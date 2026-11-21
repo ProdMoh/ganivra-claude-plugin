@@ -7,11 +7,12 @@ never stored or printed. Nothing is sent over the network.
 
 Usage:
     python3 -I ganivra_usage.py audit  [--days N]
-    python3 -I ganivra_usage.py report [--days N] [--csv]
+    python3 -I ganivra_usage.py report [--days N] [--csv] [--plan KEY] [--plan-price USD]
     python3 -I ganivra_usage.py install-statusline
 """
 import glob
 import json
+import math
 import os
 import re
 import shutil
@@ -26,6 +27,20 @@ INSTALL_DIR = os.path.join(os.environ.get("GANIVRA_HOME") or os.path.expanduser(
 COMPARE = ("claude-sonnet-5-5", "claude-haiku-5-5")
 COMMAND_TAG = re.compile(r"<command-name>/?([A-Za-z0-9_.:-]+)</command-name>")
 CHARS_PER_TOKEN = 4
+# Shared with the Ganivra seat check (ganivra.com/check.sh), which saves the plan you chose there.
+SETTINGS_PATH = os.path.join(os.environ.get("GANIVRA_HOME") or os.path.expanduser("~/.ganivra"), "check.json")
+# Monthly USD prices from claude.com/pricing, checked 2026-11-21. Same keys as the seat check.
+PLANS = {
+    "pro": ("Claude Pro", 20.0),
+    "pro-annual": ("Claude Pro, billed yearly", 17.0),
+    "max": ("Claude Max (5x Pro)", 100.0),
+    "ultra": ("Claude Ultra", 200.0),
+    "team-standard": ("Claude Team, Standard seat", 25.0),
+    "team-standard-annual": ("Claude Team, Standard seat, billed yearly", 20.0),
+    "team-premium": ("Claude Team, Premium seat", 125.0),
+    "team-premium-annual": ("Claude Team, Premium seat, billed yearly", 100.0),
+    "api": ("API key, pay per token", None),
+}
 
 
 # ---------------------------------------------------------------- pricing
@@ -516,7 +531,7 @@ def loaded_vs_used(sessions, by_session, pricer):
 
 # ---------------------------------------------------------------- report
 
-def report(days=30, as_csv=False, out=sys.stdout):
+def report(days=30, as_csv=False, out=sys.stdout, plan=None):
     pricer = Pricer()
     requests, _ = read_logs(window(days), pricer)
     w = out.write
@@ -560,6 +575,7 @@ def report(days=30, as_csv=False, out=sys.stdout):
             w(f"| {len(ordered) - limit} others | {usd(rest)} | {pct(rest, total)} | | |\n")
         w("\n")
 
+    plan_section(requests, total, days, plan, out)
     table("By project", lambda r: r["project"])
     table("By model", lambda r: display_model(r["model"]) + (" (fast)" if r["speed"] == "fast" else ""))
 
@@ -589,6 +605,81 @@ def report(days=30, as_csv=False, out=sys.stdout):
         models = ", ".join(sorted({r["model"] for r in unpriced}))
         w(f"{len(unpriced):,} requests on models without a bundled price are excluded: {models}.\n\n")
     w(footer(pricer) + "\n")
+
+
+# ---------------------------------------------------------------- plan verdict
+
+def load_plan(settings_path=None):
+    """(key, monthly USD) saved by the seat check or by --plan; (None, None) if not set."""
+    try:
+        with open(settings_path or SETTINGS_PATH) as f:
+            saved = json.load(f).get("claude") or {}
+    except (OSError, ValueError, AttributeError):
+        return None, None
+    key, price = saved.get("plan"), saved.get("price")
+    if key not in PLANS:
+        key = None
+    if price is None and key:
+        price = PLANS[key][1]
+    return key, (float(price) if isinstance(price, (int, float)) else None)
+
+
+def save_plan(key, price, settings_path=None):
+    path = settings_path or SETTINGS_PATH
+    try:
+        with open(path) as f:
+            settings = json.load(f)
+        if not isinstance(settings, dict):
+            settings = {}
+    except (OSError, ValueError):
+        settings = {}
+    settings["claude"] = {"plan": key, "price": price}
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(json.dumps(settings, indent=2) + "\n")
+    except OSError:
+        pass
+
+
+def verdict(monthly, active_days, key, price):
+    """One sentence comparing a month of usage at API rates with the plan price (same rules as the seat check)."""
+    if key == "api":
+        return f"You already pay per token: about {usd(monthly)} a month at list rates."
+    if price is None:
+        return None
+    if active_days < 5:
+        return f"Only {active_days} active day{'s' if active_days != 1 else ''} in the logs: too few to judge the plan."
+    ratio = monthly / price if price else math.inf
+    if ratio < 0.5:
+        return (f"API billing would have cost less: about {usd(monthly)} a month against ${price:,.0f}. "
+                "The plan also covers the chat app.")
+    if ratio <= 1.5:
+        return f"About break-even: {usd(monthly)} a month at API rates against ${price:,.0f}."
+    return f"Your plan covered {ratio:.1f}x its price in usage. Keep it."
+
+
+def plan_section(requests, total, days, plan, out):
+    key, price = plan or (None, None)
+    first = min(r["time"] for r in requests)
+    # Logs may cover less than the window (a new install, or Claude Code's 30-day log cleanup).
+    span = max(1, min(days, math.ceil((datetime.now(timezone.utc) - first).total_seconds() / 86400)))
+    monthly = total * 30 / span
+    active = len({r["time"].astimezone().date() for r in requests})
+    w = out.write
+    w("### Your plan\n\n")
+    basis = f"{span} days of logs" if span < days else f"the last {days} days"
+    w(f"Same usage at API rates: **about {usd(monthly)} a month** (from {basis}).\n\n")
+    sentence = verdict(monthly, active, key, price)
+    if sentence is None:
+        w("Add your plan to compare: `/ganivra:report --plan max` (pro, pro-annual, max, ultra, team-standard, "
+          "team-premium, api), or `--plan-price 26` for what you pay a month in USD. It is remembered.\n\n")
+        return
+    label = PLANS[key][0] if key else "Your plan"
+    price_text = f", ${price:,.0f} a month" if price is not None else ""
+    w(f"Plan: {label}{price_text}.\n\n**{sentence}**\n\n")
+    if key != "api":
+        w("A plan's value also depends on its limits and the chat app, which this does not count.\n\n")
 
 
 def _csv(value):
@@ -698,7 +789,29 @@ def main(argv):
     if command == "audit":
         audit(days)
     elif command == "report":
-        report(days, as_csv="--csv" in argv)
+        plan = load_plan()
+        if "--plan" in argv or "--plan-price" in argv:
+            key, price = plan if "--plan" not in argv else (None, None)
+            if "--plan" in argv:
+                key = argv[argv.index("--plan") + 1] if argv.index("--plan") + 1 < len(argv) else ""
+                if key not in PLANS:
+                    print(f"--plan needs one of: {', '.join(PLANS)}")
+                    return 2
+                price = PLANS[key][1]
+            if "--plan-price" in argv:
+                try:
+                    price = float(argv[argv.index("--plan-price") + 1])
+                except (IndexError, ValueError):
+                    print("--plan-price needs what you pay a month in USD, e.g. --plan-price 26")
+                    return 2
+                if price <= 0:
+                    print("--plan-price must be more than 0")
+                    return 2
+                if key == "api":
+                    key = None
+            plan = (key, price)
+            save_plan(key, price)
+        report(days, as_csv="--csv" in argv, plan=plan)
     elif command == "install-statusline":
         install_statusline()
     else:
